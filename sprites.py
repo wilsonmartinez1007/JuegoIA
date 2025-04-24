@@ -1,7 +1,9 @@
 from config import*
 import pygame
 from Logica.logicaJuegoIA import encontrar_caminoAmplitud, matrizPos,mCostos, encontrar_camino_Profundidad, encontrar_camino_astar
-from Logica.logicaJuegoIA import continuar_con_otra_busqueda,dfs_hasta_atasco
+from Logica.logicaJuegoIA import continuar_con_otra_busqueda,dfs_hasta_atasco, xA,yA
+
+
 class Wall:
     def __init__(self,x,y):
             self.rect = pygame.Rect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -75,7 +77,7 @@ class Queso:
 
 
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, game):
         #pos inicial del jugado
         self.x = x * TILE_SIZE + TILE_SIZE // 2
         self.y = y * TILE_SIZE + TILE_SIZE // 2
@@ -122,12 +124,14 @@ class Player:
         self.speed = PLAYER_SPEED
         self.index_direccion = 0
 
+
+        self.game = game  # Guardamos la referencia a Game
+
     def establecer_ruta(self, matrizPos):
         self.ruta = continuar_con_otra_busqueda(matrizPos, mCostos)
-        print(self.ruta)
         self.direcciones = self.convertir_a_direcciones(self.ruta)
-        print(self.direcciones)
         self.index_direccion = 0
+        
 
     def convertir_a_direcciones(self, camino):
         direcciones_dict = {
@@ -174,11 +178,15 @@ class Player:
             if self.rect.center == self.destino_px:
                 self.index_direccion += 1
                 self.destino_px = None  # Preparar siguiente destino
+            #Actualizar  estado de mov
+            self.is_moving = self.dx != 0 or self.dy != 0
 
         else:
-            print("¡Ruta completada!")
             self.dx = self.dy = 0
             self.ruta_finalizada = True
+            self.game.pantalla_gano()
+            if self.game.meDesplazo:
+               self.handle_input()
 
 
     def update_animation(self):
@@ -188,7 +196,7 @@ class Player:
               return
         
         current_time = pygame.time.get_ticks()
-
+        
         if current_time - self.animation_timer>ANIMATION_SPEED:
             #Avanzar el siguiente frame
             self.current_frame = (self.current_frame + 1)%ANIMATION_FRAMES
@@ -271,32 +279,42 @@ class Player:
                     
             
     def handle_input(self):
-            """Manejar la entrada del usuario y actualizar velocidad"""
-            keys = pygame.key.get_pressed()
+        """Manejar la entrada del usuario y actualizar velocidad"""
+        keys = pygame.key.get_pressed()
 
-            #Reiniciar la velocidad
-            self.dx = 0
-            self.dy = 0
-            
+        # Reiniciar la velocidad
+        self.dx = 0
+        self.dy = 0
 
-            #Actualizar velocidad y direccion basado en las teclas presionadas
-            if keys[pygame.K_RIGHT]:
-                  self.dx = PLAYER_SPEED
-                  self.direction = RIGHT
-            elif keys[pygame.K_LEFT]:
-                  self.dx = -PLAYER_SPEED
-                  self.direction = LEFT
-            elif keys[pygame.K_UP]:
-                  self.dy = -PLAYER_SPEED
-                  self.direction = UP
-            elif keys[pygame.K_DOWN]:
-                  self.dy = PLAYER_SPEED
-                  self.direction = DOWN
-            
+        # Volver a calcular la ruta si se presiona ENTER
+        if keys[pygame.K_RETURN]:
+            print("↩️ Volviendo a aplicar la técnica de búsqueda...")
+            self.rect.centerx = (self.rect.centerx // TILE_SIZE) * TILE_SIZE + TILE_SIZE // 2
+            self.rect.centery = (self.rect.centery // TILE_SIZE) * TILE_SIZE + TILE_SIZE // 2
+            self.actualizarMatriz()
+            self.ruta_finalizada = False
+            self.establecer_ruta(matrizPos)  # ← Recalcula la ruta
+            self.destino_px = None  # ← Prepara nueva ruta
+            self.index_direccion = 0
+            return  # Evita moverse con teclas en el mismo frame
 
-            #Actualizar  estado de mov
-            self.is_moving = self.dx != 0 or self.dy != 0
-            
+        # Actualizar velocidad y dirección basado en las teclas presionadas
+        if keys[pygame.K_RIGHT]:
+            self.dx = PLAYER_SPEED
+            self.direction = RIGHT
+        elif keys[pygame.K_LEFT]:
+            self.dx = -PLAYER_SPEED
+            self.direction = LEFT
+        elif keys[pygame.K_UP]:
+            self.dy = -PLAYER_SPEED
+            self.direction = UP
+        elif keys[pygame.K_DOWN]:
+            self.dy = PLAYER_SPEED
+            self.direction = DOWN
+
+        # Actualizar estado de movimiento
+        self.is_moving = self.dx != 0 or self.dy != 0
+
     def check_collision(self, walls, dx=0, dy=0):
         #Comprobar si hay colsion en una posicion futura
         #Creaer un rectangulo temporal en la posicion futura
@@ -308,15 +326,24 @@ class Player:
             if future_rect.colliderect(wall.rect):
                 return True
         return False
-            
+    def actualizarMatriz(self):
+        self.fila = self.rect.centery // TILE_SIZE
+        self.columna = self.rect.centerx // TILE_SIZE
+        matrizPos[self.fila][self.columna] = "P"
+        matrizPos[xA][yA] = 0
+         
            
     def update(self, walls):
-          #self.handle_input()
           if not self.ruta_finalizada:
             self.camino()
-          self.update_animation()
-          self.update_image()
-          self.move(walls)
+            self.update_animation()
+            self.update_image()
+            self.move(walls)
+          else:
+               self.handle_input()
+               self.update_animation()
+               self.update_image()
+               self.move(walls)
        
 
            

@@ -9,6 +9,8 @@ def main():
     try:
         #inicializar pygame
         pygame.init()
+        
+        
 
         #crear y correr juego
         game = Game()

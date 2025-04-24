@@ -1,13 +1,16 @@
 
 from collections import deque
 import heapq
+
+#pos actual del raton
+xA, yA = 0,0
 matrizPos = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,"P",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,1,1,1,"G",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
     [1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1],
-    [1,1,0,0,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,0,0,1],
-    [1,"Q",1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1],
+    [1,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,0,0,0,1],
+    [1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1],
     [1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
     [1,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1],
     [1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
@@ -17,7 +20,7 @@ matrizPos = [
     [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,0,1],
     [1,0,0,0,0,0,1,1,1,1,0,1,1,0,0,0,0,0,1,1,1,1,1,0,1],
-    [1,0,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1],
+    [1,"Q",1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1],
     [1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -35,8 +38,9 @@ def crearCosto():
             if matrizPos[filas][columnas] == 1:
                 mCostos[filas][columnas] = "inf"
             elif matrizPos[filas][columnas] == "G":
-                mCostos[filas][columnas] = 10
-            else: 
+                mCostos[filas][columnas] = 100
+            else:
+                xA, Ya = filas, columnas 
                 mCostos[filas][columnas] = 1
 
     
@@ -275,13 +279,11 @@ def continuar_con_otra_busqueda(matriz, matriz_costos):
     camino_parcial, nodo_atascado = dfs_hasta_atasco(matriz)
 
     if not camino_parcial:
-        print("DFS no encontró nada, usar BFS/A* desde el inicio.")
         return encontrar_camino_astar(matriz, matriz_costos)
 
     if nodo_atascado is None:
         return camino_parcial  # DFS llegó a la meta
 
-    print("DFS se atascó en:", nodo_atascado)
     # Cambiar temporalmente el punto de inicio a donde se atascó
     matriz_temp = [fila[:] for fila in matriz]
     for i in range(len(matriz_temp)):
