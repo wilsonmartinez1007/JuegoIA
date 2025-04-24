@@ -2,8 +2,7 @@
 from collections import deque
 import heapq
 
-#pos actual del raton
-xA, yA = 0,0
+
 matrizPos = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,"P",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -30,17 +29,17 @@ n = len(matrizPos)
 m = len(matrizPos[0])
 mCostos =[[0 for _ in range(m)] for _ in range(n)]
 def crearCosto():
-    #FALTA COLOCAR EN LA MATRIZ NORMAL LAS LETRAS QUE SON OBSTACULOS Y 
-    # ESTE METODO LA CONDICION DE CUANDO ENCUENTRA ESAS LETRAS CUANTO VALE
-    
     for filas in range(n):
         for columnas in range(m):
             if matrizPos[filas][columnas] == 1:
                 mCostos[filas][columnas] = "inf"
             elif matrizPos[filas][columnas] == "G":
                 mCostos[filas][columnas] = 100
+
+            elif matrizPos[filas][columnas] == "P":
+                mCostos[filas][columnas] = 1
+                xA, yA = filas, columnas 
             else:
-                xA, Ya = filas, columnas 
                 mCostos[filas][columnas] = 1
 
     
@@ -76,7 +75,7 @@ def encontrar_caminoAmplitud(matriz):
     objetivo_encontrado = None
 
     while cola:
-        actual = cola.popleft()
+        actual = cola.popleft()#sacamos el primero en ingresar
 
         if actual in objetivos:
             objetivo_encontrado = actual
@@ -105,69 +104,6 @@ def encontrar_caminoAmplitud(matriz):
     camino.append(inicio)
     camino.reverse()
     return camino
-
-
-def encontrar_camino_Profundidad(matriz):
-    filas = len(matriz)
-    columnas = len(matriz[0])
-    inicio = None
-    objetivos = []
-
-    # Buscar inicio y metas
-    for i in range(filas):
-        for j in range(columnas):
-            if matriz[i][j] == "P":
-                inicio = (i, j)
-            elif matriz[i][j] == "Q":
-                objetivos.append((i, j))
-
-    if not inicio or not objetivos:
-        return None
-
-    pila = [inicio]
-    visitado = set()
-    padres = {}
-    objetivo_encontrado = None
-
-    direcciones = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-
-    while pila:
-        actual = pila.pop()  # ← diferencia: usar `pop` (último elemento)
-        if actual in visitado:
-            continue
-        visitado.add(actual)
-
-        if actual in objetivos:
-            objetivo_encontrado = actual
-            break
-
-        for dx, dy in direcciones:
-            nx, ny = actual[0] + dx, actual[1] + dy
-            if 0 <= nx < filas and 0 <= ny < columnas:
-                if matriz[nx][ny] in [0,"G","Q"] and (nx, ny) not in visitado:
-                    pila.append((nx, ny))
-                    if (nx, ny) not in padres:  # guardar el padre solo la primera vez
-                        padres[(nx, ny)] = actual
-
-    # Si no encontró ninguna Q
-    if not objetivo_encontrado:
-        return None
-
-    # Reconstrucción del camino
-    camino = []
-    nodo = objetivo_encontrado
-    while nodo != inicio:
-        camino.append(nodo)
-        nodo = padres.get(nodo)
-        if nodo is None:
-            return None
-    camino.append(inicio)
-    camino.reverse()
-    return camino
-
-
-
-
 def heuristica(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
@@ -230,7 +166,7 @@ def encontrar_camino_astar(matriz, matriz_costos):
     camino.append(inicio)
     camino.reverse()
     return camino
-def dfs_hasta_atasco(matriz):
+def encontrar_camino_Profundidad(matriz):
     filas = len(matriz)
     columnas = len(matriz[0])
     inicio = None
@@ -276,7 +212,7 @@ def dfs_hasta_atasco(matriz):
 
 def continuar_con_otra_busqueda(matriz, matriz_costos):
     crearCosto()
-    camino_parcial, nodo_atascado = dfs_hasta_atasco(matriz)
+    camino_parcial, nodo_atascado = encontrar_camino_Profundidad(matriz)
 
     if not camino_parcial:
         return encontrar_camino_astar(matriz, matriz_costos)
@@ -316,7 +252,6 @@ if __name__=="__main__":
     camino3 = encontrar_camino_astar(matrizPos, mCostos)
     print("Camino encontrado A*:")
     print(camino3)
-
     print("-------------------")
     camino4 = continuar_con_otra_busqueda(matrizPos, mCostos)
     print(camino4)

@@ -1,7 +1,7 @@
 from config import*
 import pygame
 from Logica.logicaJuegoIA import encontrar_caminoAmplitud, matrizPos,mCostos, encontrar_camino_Profundidad, encontrar_camino_astar
-from Logica.logicaJuegoIA import continuar_con_otra_busqueda,dfs_hasta_atasco, xA,yA
+from Logica.logicaJuegoIA import continuar_con_otra_busqueda
 
 
 class Wall:
@@ -288,7 +288,6 @@ class Player:
 
         # Volver a calcular la ruta si se presiona ENTER
         if keys[pygame.K_RETURN]:
-            print("↩️ Volviendo a aplicar la técnica de búsqueda...")
             self.rect.centerx = (self.rect.centerx // TILE_SIZE) * TILE_SIZE + TILE_SIZE // 2
             self.rect.centery = (self.rect.centery // TILE_SIZE) * TILE_SIZE + TILE_SIZE // 2
             self.actualizarMatriz()
@@ -330,7 +329,7 @@ class Player:
         self.fila = self.rect.centery // TILE_SIZE
         self.columna = self.rect.centerx // TILE_SIZE
         matrizPos[self.fila][self.columna] = "P"
-        matrizPos[xA][yA] = 0
+        
          
            
     def update(self, walls):

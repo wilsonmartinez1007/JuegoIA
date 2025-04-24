@@ -83,9 +83,11 @@ class Game:
             self.clock.tick(60)
     def pantalla_gano(self):
         font_inicio = pygame.font.Font("assets/fonts/Silver.ttf", 30)
+        font_gano = pygame.font.Font("assets/fonts/Silver.ttf", 40)
+
         boton_desplazarJugador = pygame.Rect(SCREEN_WIDTH / 2 - 150, SCREEN_HEIGTH / 2 - 50, 300, 50)
         boton_salir = pygame.Rect(SCREEN_WIDTH / 2 - 150, SCREEN_HEIGTH / 2 + 50, 300, 50)
-
+        
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -94,13 +96,23 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if boton_desplazarJugador.collidepoint(event.pos):
                         self.meDesplazo = True
-                        return   # Sale del menú y me desplazo
+                        return
                     if boton_salir.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
             
             self.screen.fill(YELLOW)
 
+            # Cuadro y texto de "¡Ganaste!"
+            mensaje_rect = pygame.Rect(SCREEN_WIDTH / 2 - 200, SCREEN_HEIGTH / 2 - 150, 400, 80)
+            pygame.draw.rect(self.screen, (0, 0, 0), mensaje_rect, border_radius=10)
+            pygame.draw.rect(self.screen, (255, 255, 255), mensaje_rect.inflate(-10, -10), border_radius=10)
+
+            texto_gano = font_gano.render("¡Ganaste!", True, (0, 0, 0))
+            texto_gano_rect = texto_gano.get_rect(center=mensaje_rect.center)
+            self.screen.blit(texto_gano, texto_gano_rect)
+
+            # Botones
             pygame.draw.rect(self.screen, MORADO, boton_desplazarJugador)
             pygame.draw.rect(self.screen, ROJO, boton_salir)
 
