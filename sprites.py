@@ -8,11 +8,12 @@ class Wall:
     def __init__(self,x,y):
             self.rect = pygame.Rect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE)
     def draw(self, screen):
-        """Dibujar la pared en la pantalla"""
+        """Dibujamos la pared en la pantalla"""
         pygame.draw.rect(screen, WALL_COLOR,self.rect)  
 
 class Gato:
     def __init__(self,x,y):
+        #pasamos de la Ubicacion en matriz a cordenada en pixeles
         self.x = x * TILE_SIZE + TILE_SIZE // 2
         self.y = y * TILE_SIZE + TILE_SIZE // 2
         #cargar sprite sheet de gato
@@ -26,9 +27,11 @@ class Gato:
         self.frames.append(frame)
 
         #Variables de animacion
-        self.current_frame = 0
-        self.animation_timer = pygame.time.get_ticks()
-        #CREAR EL REGTANGULO para colisiones y posicionamientos
+        self.current_frame = 0 #frame en el que vamos
+        self.animation_timer = pygame.time.get_ticks()#ultima ves que cambiamos de animacion
+
+
+        #creamos el rectangulo para colisiones y posicionamientos
         self.rect = self.frames[0].get_rect(center=(self.x, self.y))
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -129,26 +132,8 @@ class Player:
 
     def establecer_ruta(self, matrizPos):
         self.ruta = continuar_con_otra_busqueda(matrizPos, mCostos)
-        self.direcciones = self.convertir_a_direcciones(self.ruta)
-        self.index_direccion = 0
         
 
-    def convertir_a_direcciones(self, camino):
-        direcciones_dict = {
-            (0, 1): RIGHT,
-            (0, -1): LEFT,
-            (-1, 0): UP,
-            (1, 0): DOWN
-        }
-        direcciones = []
-        for i in range(len(camino) - 1):
-            actual = camino[i]
-            siguiente = camino[i + 1]
-            dx = siguiente[0] - actual[0]
-            dy = siguiente[1] - actual[1]
-            mov =direcciones_dict.get((dx, dy))
-            direcciones.append(mov)
-        return direcciones
     def camino(self):
         self.dx, self.dy = 0, 0
 
@@ -171,6 +156,8 @@ class Player:
             elif self.rect.centery > self.destino_px[1]:
                 self.dy = -min(self.speed, self.rect.centery - self.destino_px[1])
 
+
+            #nos movemos
             self.rect.centerx += self.dx
             self.rect.centery += self.dy
 

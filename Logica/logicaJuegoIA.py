@@ -89,7 +89,7 @@ def encontrar_caminoAmplitud(matriz):
                     visitado.add((nx, ny))
                     padres[(nx, ny)] = actual
 
-    # Si no encontró ningún "Q"
+    # Si no encontramos "Q"
     if not objetivo_encontrado:
         return None
 

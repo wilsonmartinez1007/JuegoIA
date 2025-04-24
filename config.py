@@ -7,7 +7,7 @@ SCREEN_HEIGTH = 600
 
 #Configuracion del jugador
 PLAYER_SIZE = 30 #Tamaño del cuadro que representa a LUigi
-PLAYER_SPEED = 3#Velocidad de movimiento
+PLAYER_SPEED = 3#Velocidad de movimiento(pixeles por frame)
 ANIMATION_SPEED = 70 #Milisegundos entre frames de animacion
 ANIMATION_FRAMES = 8 #Numero total de frames en el sprite sheet
 
